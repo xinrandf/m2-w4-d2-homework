@@ -78,6 +78,60 @@
             text-align: center;
             font-size: 0.85em;
         }
+        .floating-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            border: none;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+            text-align: left;
+            border-radius: 10px;
+            width: 250px;
+            height: 400px;
+            color: white;
+            overflow-y: auto;
+
+        }
+
+        .floating-box h2 {
+            margin: 0 0 20px 0;
+            font-size: 1.5em;
+            color: white;
+            text-align: left;
+        }
+
+        .floating-box p {
+            margin: 55px 0;
+            font-size: 1em;
+            color: white;
+            text-align: left;
+                        line-height: 2;
+        }
+
+        .floating-box .close-btn {
+            background-color: rgb(255, 255, 255);
+            color: rgb(0, 0, 0);
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+        }
+
+        .profile-img {
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
     </style>
 
     
@@ -91,7 +145,7 @@
             <blog-header :title="data.header.title"></blog-header>
             <main>
                 <aside id="photos">
-                    <img :src="data.food.image" :alt="data.food.alt" width="180">
+                    <img v-bind:src="profileImage" alt="Profile Picture" class="profile-img" v-on:click="toggleFloatingBox">
                 </aside>
                 <h2>Comments</h2>
                 <section id="blogposts">
@@ -102,6 +156,8 @@
                         :date="comment.date"
                         :reply="comment.reply"
                         :text="comment.text"
+                        :foodieLevel="comment.foodieLevel"
+                        :bio="comment.bio"
                     ></comment-post>
                 </section>
             </main>
@@ -118,13 +174,30 @@
         });
 
         Vue.component('comment-post', {
-            props: ['author', 'date', 'reply', 'text'],
+            props: ['author', 'date', 'reply', 'text', 'foodieLevel', 'bio'],
+            data: function() {
+                return {
+                    isBoxVisible: false
+                };
+            },
+            methods: {
+                toggleFloatingBox: function() {
+                    this.isBoxVisible = !this.isBoxVisible;
+                }
+            },
             template: `
                 <div class="post">
+                    <img v-bind:src="'profile.png'" alt="Profile Picture" class="profile-img" v-on:click="toggleFloatingBox">
                     <span class="author">{{ author }}</span> — 
                     <span class="date">{{ date }}</span>
                     <span class="reply">{{ reply }}</span>
                     <p>{{ text }}</p>
+                    <div class="floating-box" v-if="isBoxVisible" style="display: block;">
+                        <button class="close-btn" v-on:click="toggleFloatingBox">Close</button>
+                        <h2>{{ author }}</h2>
+                        <p><strong>Foodie Level:</strong> {{ foodieLevel }}</p>
+                        <p><strong>Bio:</strong> {{ bio }}</p>
+                    </div>
                 </div>
             `
         });
@@ -132,6 +205,11 @@
         new Vue({
             el: '#app',
             data: {
+                profileImage: 'profile.png',
+                isBoxVisible: false,
+                authorName: 'LINH',
+                foodieLevel: 'Newcomer',
+                bio: 'Love food! Grew up with meat and potatoes. Recently venture outside my comfort zone. Loving everything I have been eating so far. Thai is my favorite at this time.',
                 data: {
                     header: {
                         title: 'Food Blog'
@@ -145,27 +223,40 @@
                             author: 'Brianna',
                             date: 'February 18, 2021 @ 3:30 pm',
                             reply: 'REPLY',
-                            text: 'Was amazing! My Walmart didn’t have coriander in stock and didn’t have ground cumin. I used serrano instead of jalapeño. It was just like my favorite tortilla soup from BJs. I am sending this recipe to my family. I want everyone to try it!'
+                            text: 'Was amazing! My Walmart didn’t have coriander in stock and didn’t have ground cumin. I used serrano instead of jalapeño. It was just like my favorite tortilla soup from BJs. I am sending this recipe to my family. I want everyone to try it!',
+                            foodieLevel: 'Novice',
+                            bio: 'Food enthusiast. Love to cook and experiment. Into only organic, fat free, sugar free stuffs!'
                         },
                         {
                             author: 'LINH',
                             date: 'February 15, 2021 @ 9:46 am',
                             reply: 'REPLY',
-                            text: 'I just made this soup today and it’s so tasty! didn’t have corn at home but still turned out very good.  It’s a winner!  I made beef chili for my parents; but since my dad has gout he can’t eat beef; this white chicken chili is perfect for him.  Thank you Lisa!'
+                            text: 'I just made this soup today and it’s so tasty! didn’t have corn at home but still turned out very good.  It’s a winner!  I made beef chili for my parents; but since my dad has gout he can’t eat beef; this white chicken chili is perfect for him.  Thank you Lisa!',
+                            foodieLevel: 'Newcomer',
+                            bio: 'Love food! Grew up with meat and potatoes. Recently venture outside my comfort zone. Loving everything I have been eating so far. Thai is my favorite at this time.'
                         },
                         {
                             author: 'CATHERINE LEONARDO',
                             date: 'February 13, 2021 @ 12:58 pm',
                             reply: 'REPLY',
-                            text: 'I LOVE this White Chicken Chili! You are right, it is satiating meal—delicious with toasted bread. Refreshingly different taste than any chicken chili I’ve made in the past. I made it exactly as written and added some chopped zucchini, carrots, and celery. Instead of shredding the chicken, I chopped it into small pieces. It freezes very well. Will be an all-time favorite, for sure.'
+                            text: 'I LOVE this White Chicken Chili! You are right, it is satiating meal—delicious with toasted bread. Refreshingly different taste than any chicken chili I’ve made in the past. I made it exactly as written and added some chopped zucchini, carrots, and celery. Instead of shredding the chicken, I chopped it into small pieces. It freezes very well. Will be an all-time favorite, for sure.',
+                            foodieLevel: 'Mentor',
+                            bio: 'I have to say I never was the adventurous type until 2 years ago. My boyfriend, who is of Japanese background, exposed me to other cultural food and I have never look back since!'
                         },
                         {
                             author: 'KALI',
                             date: 'February 13, 2021 @ 11:31 am',
                             reply: 'REPLY',
-                            text: 'This recipe is dynamite! My partner usually won’t eat beans but he finished the whole pot (darn was hoping to have some for leftovers haha). This is crowd-pleaser that I am going to add to my regular recipe rotation. Thanks so much, Lisa!'
+                            text: 'This recipe is dynamite! My partner usually won’t eat beans but he finished the whole pot (darn was hoping to have some for leftovers haha). This is crowd-pleaser that I am going to add to my regular recipe rotation. Thanks so much, Lisa!',
+                            foodieLevel: 'Novice',
+                            bio: 'Food is my passion. So is cooking. I love to experiment and try new things. I have to admit I’m a food whore! Invite me over for dinner and I’ll be there!'
                         }
                     ]
+                }
+            },
+            methods: {
+                toggleFloatingBox: function () {
+                    this.isBoxVisible = !this.isBoxVisible;
                 }
             }
         });
